@@ -305,7 +305,7 @@ standard_ExecutorRun(QueryDesc *queryDesc,
 
 	/**** Yahya's Addition ***/
 	
-	ereport(LOG, (errmsg("HELLO!!")));
+	//ereport(LOG, (errmsg("HELLO!!")));
 
 	/*
 	 * Switch into per-query memory context
@@ -1561,7 +1561,7 @@ ExecutePlan(EState *estate,
 	Oid tupleoid = 0;
 	HeapTuple tupple;
 	//Yahya's Declarations Part-2
-	Oid reloid = 1843620;
+	Oid reloid = 16384;
 	Relation logtable = relation_open (reloid, 0);
 
 
@@ -1613,7 +1613,7 @@ ExecutePlan(EState *estate,
 		tupleoid = HeapTupleHeaderGetOid(tupple->t_data);
 		
 
-		Datum tableoid = slot_getattr(slot, -7, &snull);
+		Datum tableoid = slot_getattr(slot, 2, &snull);
 
 		Datum rowid = slot_getattr(slot, 1, &snull); //heap_getattr(tupple, -2, tupledesc, &snull);
 		// char *valstring = DatumGetCString(heapval);
@@ -1621,13 +1621,13 @@ ExecutePlan(EState *estate,
 	//	ereport(LOG, (errmsg("OID:%s , Transaction ID: %s", tupid, txid))); -- Logging in CSV file 
 
 	// Yahya's Addition Part-2
-		if (rowid != NULL)
+		if (tableoid == 24576 || tableoid == 24582)
 		{    
 		values[0] = Int64GetDatum(time_stamp);
 		values[1] = TransactionIdGetDatum(tx);
 		values[2] = rowid; //ObjectIdGetDatum(tupleoid);
 		values[3] = Int8GetDatum(op); 
-		values[4] = ObjectIdGetDatum(RelationOid);
+		values[4] = ObjectIdGetDatum(tableoid);
  
 
 	 	nayatup = heap_form_tuple(RelationGetDescr(logtable), values, nulls);

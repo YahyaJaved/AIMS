@@ -229,7 +229,10 @@ ExecInsert(ModifyTableState *mtstate,
 	Relation	resultRelationDesc;
 	Oid			newId;
 	List	   *recheckIndexes = NIL;
-/*	Yahya's Declarations */ 
+
+
+/**********************************************/
+	//Yahya's Declarations  
 
 	TransactionId tx = GetTopTransactionId();
 	char *txid = palloc (18);
@@ -238,8 +241,8 @@ ExecInsert(ModifyTableState *mtstate,
 	HeapTuple tupple;
 	Oid tupleoid = 0;
 
-/** Yahya's Declarations Part-2 */
-	Oid reloid = 1843620;
+	//Yahya's Declarations Part-2 
+	Oid reloid = 16384;
 	Relation logtable = relation_open (reloid, 0);
 
 
@@ -247,12 +250,13 @@ ExecInsert(ModifyTableState *mtstate,
 	bool		nulls[5];
 	HeapTuple	nayatup;
 	TimestampTz time_stamp = GetCurrentTimestamp(); 
-	int op = 2; /* For select commands we define operation to be represented as 1 */
+	int op = 2; // For select commands we define operation to be represented as 1
 
 
 	memset(values, 0, sizeof(values));
 	memset(nulls, false, sizeof(nulls));
 
+/************************************************/
 	
 	/*
 	 * get the heap tuple out of the tuple table slot, making sure we have a
@@ -517,16 +521,17 @@ ExecInsert(ModifyTableState *mtstate,
 	return ExecProcessReturning(resultRelInfo->ri_projectReturning,
 									slot, planSlot);
 
-/*** Yahya's Addition **/ 	
-/*	tupple = ExecFetchSlotTuple(slot); */
+/*********************************************************/
+	// Yahya's Addition 	
+	//	tupple = ExecFetchSlotTuple(slot);
 	tupleoid = HeapTupleHeaderGetOid(tuple->t_data);
 	Oid tableoid = tuple->t_tableOid;  
-	/*heapval = heap_getattr(tupple, -2, tupledesc, snull); */
-	/*char *valstring = DatumGetCString(heapval); */ 
+	// heapval = heap_getattr(tupple, -2, tupledesc, snull); 
+	//char *valstring = DatumGetCString(heapval); 
 	sprintf (tupid, "%u", tupleoid);
 	ereport(LOG, (errmsg("OID:%s , Transaction ID: %s", tupid, txid)));
 
-/* Yahya's Addition Part-2 */
+// Yahya's Addition Part-2
 		if (tupleoid != 0)
 		{    
 		values[0] = Int64GetDatum(time_stamp);
@@ -546,6 +551,8 @@ ExecInsert(ModifyTableState *mtstate,
 	pfree(txid);
 	pfree(tupid);
 	relation_close (logtable, 0);
+
+/************************************************************/
 
 	return NULL;
 }
@@ -832,7 +839,9 @@ ExecUpdate(ItemPointer tupleid,
 	HeapUpdateFailureData hufd;
 	List	   *recheckIndexes = NIL;
 
-/*	Yahya's Declarations */ 
+/************************************************************/
+
+//	Yahya's Declarations 
 
 	TransactionId tx = GetTopTransactionId();
 	char *txid = palloc (18);
@@ -841,8 +850,8 @@ ExecUpdate(ItemPointer tupleid,
 	HeapTuple tupple;
 	Oid tupleoid;
 
-/** Yahya's Declarations Part-2 */
-	Oid reloid = 1843620;
+// Yahya's Declarations Part-2
+	Oid reloid = 16384;
 	Relation logtable = relation_open (reloid, 0);
 
 
@@ -850,12 +859,13 @@ ExecUpdate(ItemPointer tupleid,
 	bool		nulls[5];
 	HeapTuple	nayatup;
 	TimestampTz time_stamp = GetCurrentTimestamp(); 
-	int op = 3; /* For update commands we define operation to be represented as 1 */
+	int op = 3; // For update commands we define operation to be represented as 1 
 
 
 	memset(values, 0, sizeof(values));
 	memset(nulls, false, sizeof(nulls));
 
+/*************************************************************/
 
 	/***** Yahya's Addition ****/
 	//ereport(LOG, (errmsg("THIS IS nodeModifyTable.c - ExecUpdate")));
@@ -896,8 +906,7 @@ ExecUpdate(ItemPointer tupleid,
 	if (resultRelInfo->ri_TrigDesc &&
 		resultRelInfo->ri_TrigDesc->trig_update_instead_row)
 	{
-		slot = ExecIRUpdateTriggers(estate, resultRelInfo,
-									oldtuple, slot);
+		slot = ExecIRUpdateTriggers(estate, resultRelInfo, oldtuple, slot);
 
 		if (slot == NULL)		/* "do nothing" */
 			return NULL;
@@ -910,10 +919,7 @@ ExecUpdate(ItemPointer tupleid,
 		/*
 		 * update in foreign table: let the FDW do it
 		 */
-		slot = resultRelInfo->ri_FdwRoutine->ExecForeignUpdate(estate,
-															   resultRelInfo,
-															   slot,
-															   planSlot);
+		slot = resultRelInfo->ri_FdwRoutine->ExecForeignUpdate(estate, resultRelInfo, slot, planSlot);
 
 		if (slot == NULL)		/* "do nothing" */
 			return NULL;
@@ -1086,13 +1092,14 @@ lreplace:;
 		return ExecProcessReturning(resultRelInfo->ri_projectReturning,
 									slot, planSlot);
 
-/*** Yahya's Addition **/ 	
+/*********************************************************************/
+// Yahya's Addition 	
 	tupleoid = HeapTupleHeaderGetOid(tuple->t_data); 
 	Oid tableoid = tuple->t_tableOid; 
 	sprintf (tupid, "%u", tupleoid);
 	ereport(LOG, (errmsg("OID:%s , Transaction ID: %s", tupid, txid)));
 
-/* Yahya's Addition Part-2 */
+// Yahya's Addition Part-2
 		if (tupleoid != 0)
 		{    
 		values[0] = Int64GetDatum(time_stamp);
@@ -1113,6 +1120,8 @@ lreplace:;
 	pfree(txid);
 	pfree(tupid);
 	relation_close (logtable, 0);
+
+/*************************************************************************/
 
 	return NULL;
 }
