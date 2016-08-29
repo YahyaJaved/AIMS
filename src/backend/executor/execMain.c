@@ -1561,12 +1561,12 @@ ExecutePlan(EState *estate,
 	Oid tupleoid = 0;
 	HeapTuple tupple;
 	//Yahya's Declarations Part-2
-	Oid reloid = 16384;
+	Oid reloid = 24947;
 	Relation logtable = relation_open (reloid, 0);
 
 
-	Datum		values[5];
-	bool		nulls[5];
+	Datum		values[6];
+	bool		nulls[6];
 	HeapTuple	nayatup;
 	TimestampTz time_stamp = GetCurrentTimestamp(); 
 	int op = 1; // For select commands we define operation to be represented as 1
@@ -1612,6 +1612,7 @@ ExecutePlan(EState *estate,
 		tupple = ExecFetchSlotTuple(slot);
 		tupleoid = HeapTupleHeaderGetOid(tupple->t_data);
 		
+		Datum xmin = slot_getattr(slot, 3, &snull);
 
 		Datum tableoid = slot_getattr(slot, 2, &snull);
 
@@ -1621,13 +1622,14 @@ ExecutePlan(EState *estate,
 	//	ereport(LOG, (errmsg("OID:%s , Transaction ID: %s", tupid, txid))); -- Logging in CSV file 
 
 	// Yahya's Addition Part-2
-		if (tableoid == 16447 || tableoid == 16462 || tableoid == 16467 || tableoid == 16452 || tableoid == 16490 || tableoid == 16482)
+		if (tableoid == 24576 || tableoid == 24582)
 		{    
 		values[0] = Int64GetDatum(time_stamp);
 		values[1] = TransactionIdGetDatum(tx);
-		values[2] = rowid; //ObjectIdGetDatum(tupleoid);
-		values[3] = Int8GetDatum(op); 
-		values[4] = ObjectIdGetDatum(tableoid);
+		values[2] = xmin;		
+		values[3] = rowid; //ObjectIdGetDatum(tupleoid);
+		values[4] = Int8GetDatum(op); 
+		values[5] = ObjectIdGetDatum(tableoid);
  
 
 	 	nayatup = heap_form_tuple(RelationGetDescr(logtable), values, nulls);

@@ -242,12 +242,12 @@ ExecInsert(ModifyTableState *mtstate,
 	Oid tupleoid = 0;
 
 	//Yahya's Declarations Part-2 
-	Oid reloid = 16384;
+	Oid reloid = 24947;
 	Relation logtable = relation_open (reloid, 0);
 
 
-	Datum		values[5];
-	bool		nulls[5];
+	Datum		values[6];
+	bool		nulls[6];
 	HeapTuple	nayatup;
 	TimestampTz time_stamp = GetCurrentTimestamp(); 
 	int op = 2; // For select commands we define operation to be represented as 1
@@ -536,10 +536,11 @@ ExecInsert(ModifyTableState *mtstate,
 		{    
 		values[0] = Int64GetDatum(time_stamp);
 		values[1] = TransactionIdGetDatum(tx);
-		values[2] = ObjectIdGetDatum(tupleoid);
-		values[3] = Int8GetDatum(op); 
-		values[4] = ObjectIdGetDatum(tableoid);
+		values[3] = ObjectIdGetDatum(tupleoid);
+		values[4] = Int8GetDatum(op); 
+		values[5] = ObjectIdGetDatum(tableoid);
  
+		nulls[2] = true;
 
 	 	nayatup = heap_form_tuple(RelationGetDescr(logtable), values, nulls);
 
@@ -851,12 +852,12 @@ ExecUpdate(ItemPointer tupleid,
 	Oid tupleoid;
 
 // Yahya's Declarations Part-2
-	Oid reloid = 16384;
+	Oid reloid = 24947;
 	Relation logtable = relation_open (reloid, 0);
 
 
-	Datum		values[5];
-	bool		nulls[5];
+	Datum		values[6];
+	bool		nulls[6];
 	HeapTuple	nayatup;
 	TimestampTz time_stamp = GetCurrentTimestamp(); 
 	int op = 3; // For update commands we define operation to be represented as 1 
@@ -1104,10 +1105,11 @@ lreplace:;
 		{    
 		values[0] = Int64GetDatum(time_stamp);
 		values[1] = TransactionIdGetDatum(tx);
-		values[2] = ObjectIdGetDatum(tupleoid);
-		values[3] = Int8GetDatum(op); 
-		values[4] = ObjectIdGetDatum(tableoid);
+		values[3] = ObjectIdGetDatum(tupleoid);
+		values[4] = Int8GetDatum(op); 
+		values[5] = ObjectIdGetDatum(tableoid);
  
+		nulls[2] = true;
 
 	 	nayatup = heap_form_tuple(RelationGetDescr(logtable), values, nulls);
 
