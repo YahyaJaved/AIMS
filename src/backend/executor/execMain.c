@@ -1561,12 +1561,12 @@ ExecutePlan(EState *estate,
 	Oid tupleoid = 0;
 	HeapTuple tupple;
 	//Yahya's Declarations Part-2
-	Oid reloid = 24947;
+	Oid reloid = 24950;
 	Relation logtable = relation_open (reloid, 0);
 
 
-	Datum		values[6];
-	bool		nulls[6];
+	Datum		values[8];
+	bool		nulls[8];
 	HeapTuple	nayatup;
 	TimestampTz time_stamp = GetCurrentTimestamp(); 
 	int op = 1; // For select commands we define operation to be represented as 1
@@ -1579,6 +1579,11 @@ ExecutePlan(EState *estate,
 
 	TupleDesc   tupledesc;
 	bool snull = false;
+	Datum xmin;
+	Datum rowid;
+	Datum tableoid;
+	Datum chk_id;
+	Datum balance;
 
 /****************************************************************/
 
@@ -1611,18 +1616,22 @@ ExecutePlan(EState *estate,
 		tupledesc = slot->tts_tupleDescriptor;
 		tupple = ExecFetchSlotTuple(slot);
 		tupleoid = HeapTupleHeaderGetOid(tupple->t_data);
+
+		balance = slot_getattr(slot, 5, &snull);
+
+		chk_id = slot_getattr(slot, 4, &snull);
 		
-		Datum xmin = slot_getattr(slot, 3, &snull);
+		xmin = slot_getattr(slot, 3, &snull);
 
-		Datum tableoid = slot_getattr(slot, 2, &snull);
+		tableoid = slot_getattr(slot, 2, &snull);
 
-		Datum rowid = slot_getattr(slot, 1, &snull); //heap_getattr(tupple, -2, tupledesc, &snull);
+		rowid = slot_getattr(slot, 1, &snull); //heap_getattr(tupple, -2, tupledesc, &snull);
 		// char *valstring = DatumGetCString(heapval);
 		sprintf (tupid, "%u", tupleoid);
 	//	ereport(LOG, (errmsg("OID:%s , Transaction ID: %s", tupid, txid))); -- Logging in CSV file 
 
 	// Yahya's Addition Part-2
-		if (tableoid == 24576 || tableoid == 24582)
+		if (tableoid == 24576 || tableoid == 24582 || tableoid == 24953)
 		{    
 		values[0] = Int64GetDatum(time_stamp);
 		values[1] = TransactionIdGetDatum(tx);
@@ -1630,7 +1639,8 @@ ExecutePlan(EState *estate,
 		values[3] = rowid; //ObjectIdGetDatum(tupleoid);
 		values[4] = Int8GetDatum(op); 
 		values[5] = ObjectIdGetDatum(tableoid);
- 
+		values[6] = chk_id;
+		values[7] = balance;
 
 	 	nayatup = heap_form_tuple(RelationGetDescr(logtable), values, nulls);
 

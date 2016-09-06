@@ -242,12 +242,12 @@ ExecInsert(ModifyTableState *mtstate,
 	Oid tupleoid = 0;
 
 	//Yahya's Declarations Part-2 
-	Oid reloid = 24947;
+	Oid reloid = 24950;
 	Relation logtable = relation_open (reloid, 0);
 
 
-	Datum		values[6];
-	bool		nulls[6];
+	Datum		values[8];
+	bool		nulls[8];
 	HeapTuple	nayatup;
 	TimestampTz time_stamp = GetCurrentTimestamp(); 
 	int op = 2; // For select commands we define operation to be represented as 1
@@ -531,6 +531,13 @@ ExecInsert(ModifyTableState *mtstate,
 	sprintf (tupid, "%u", tupleoid);
 	ereport(LOG, (errmsg("OID:%s , Transaction ID: %s", tupid, txid)));
 
+
+	bool snull = false;
+
+	Datum chk_id = slot_getattr(slot, 1, &snull);
+	Datum balance = slot_getattr(slot, 2, &snull);
+	
+
 // Yahya's Addition Part-2
 		if (tupleoid != 0)
 		{    
@@ -539,6 +546,8 @@ ExecInsert(ModifyTableState *mtstate,
 		values[3] = ObjectIdGetDatum(tupleoid);
 		values[4] = Int8GetDatum(op); 
 		values[5] = ObjectIdGetDatum(tableoid);
+		values[6] = chk_id;
+		values[7] = balance;
  
 		nulls[2] = true;
 
@@ -856,8 +865,8 @@ ExecUpdate(ItemPointer tupleid,
 	Relation logtable = relation_open (reloid, 0);
 
 
-	Datum		values[6];
-	bool		nulls[6];
+	Datum		values[8];
+	bool		nulls[8];
 	HeapTuple	nayatup;
 	TimestampTz time_stamp = GetCurrentTimestamp(); 
 	int op = 3; // For update commands we define operation to be represented as 1 
@@ -1099,16 +1108,24 @@ lreplace:;
 	Oid tableoid = tuple->t_tableOid; 
 	sprintf (tupid, "%u", tupleoid);
 	ereport(LOG, (errmsg("OID:%s , Transaction ID: %s", tupid, txid)));
+	
+	bool snull = false;
+
+	Datum chk_id = slot_getattr(slot, 1, &snull);
+	Datum balance = slot_getattr(slot, 2, &snull);
 
 // Yahya's Addition Part-2
 		if (tupleoid != 0)
 		{    
 		values[0] = Int64GetDatum(time_stamp);
 		values[1] = TransactionIdGetDatum(tx);
-		values[2] = ObjectIdGetDatum(tupleoid);
-		values[3] = Int8GetDatum(op); 
-		values[4] = ObjectIdGetDatum(tableoid);
+		values[3] = ObjectIdGetDatum(tupleoid);
+		values[4] = Int8GetDatum(op); 
+		values[5] = ObjectIdGetDatum(tableoid);
+		values[6] = chk_id;
+		values[7] = balance;
  
+		nulls[2] = true;
 
 	 	nayatup = heap_form_tuple(RelationGetDescr(logtable), values, nulls);
 
